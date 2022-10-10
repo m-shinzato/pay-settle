@@ -10,5 +10,7 @@ func main() {
 	router.GET("/debts", handler.GetDebts)
 	router.GET("/calculate", handler.Calculate)
 
+	router.POST("/register", handler.Resister)
+
 	router.Run("localhost:8080")
 }

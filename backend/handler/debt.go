@@ -50,3 +50,17 @@ func Calculate(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, res)
 }
+
+func Resister(c *gin.Context) {
+	
+	// TODO 登録処理
+	// request body を c から受け取る
+	// request body のバリデーションチェック
+
+	// チェックが OK ならば DB へ登録
+	if err := model.Register(debt); err != nil {
+		// do error handling
+		// do 500 bann wo kaesu
+	}
+	c.IndentedJSON(http.StatusOK)
+}

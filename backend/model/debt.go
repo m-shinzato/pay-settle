@@ -50,3 +50,8 @@ func GetDebts() []Debt {
 		},
 	}
 }
+
+func Resister(d *Debt) error {
+	// DB へ登録
+	return nil
+}
