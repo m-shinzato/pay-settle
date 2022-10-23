@@ -3,12 +3,31 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/m-shinzato/pay-settle/model"
+
 	"net/http"
+	"time"
 )
 
 // GetDebts responds with the list of all albums as JSON.
 func GetDebts(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, model.GetDebts())
+}
+
+// Register handles a requests for registering one debt
+func Register(c *gin.Context) {
+    // TODO parse request body
+    var debt model.Debt
+    c.BindJSON(&debt)
+
+    now := time.Now()
+    debt.CreatedAt = now
+    debt.UpdatedAt = now
+
+    if err := model.Register(&debt); err != nil {
+        c.IndentedJSON(http.StatusInternalServerError, err)
+    }
+
+    c.IndentedJSON(http.StatusOK, nil)
 }
 
 // Calculate responds with the price someone have to pay.

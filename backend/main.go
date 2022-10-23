@@ -9,6 +9,7 @@ func main() {
 	router := gin.Default()
 	router.GET("/debts", handler.GetDebts)
 	router.GET("/calculate", handler.Calculate)
+	router.POST("/register", handler.Register)
 
 	router.Run("localhost:8080")
 }
