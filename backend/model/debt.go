@@ -20,6 +20,8 @@ type Debt struct {
 // Register registers a debt
 func Register(debt *Debt) error {
     // TODO insert debt to DataBase
+
+
     // print debt for just debugging
     fmt.Println("inserted: debt.Price = ", debt.Price)
     fmt.Println("inserted: debt.Lender = ", debt.Lender)
