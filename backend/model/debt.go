@@ -1,8 +1,8 @@
 package model
 
 import (
-    "time"
-    "fmt"
+	"fmt"
+	"time"
 )
 
 // Debt represents data about a record debt.
@@ -19,15 +19,14 @@ type Debt struct {
 
 // Register registers a debt
 func Register(debt *Debt) error {
-    // TODO insert debt to DataBase
+	// TODO insert debt to DataBase
 
+	// print debt for just debugging
+	fmt.Println("inserted: debt.Price = ", debt.Price)
+	fmt.Println("inserted: debt.Lender = ", debt.Lender)
+	fmt.Println("inserted: debt.Debtor = ", debt.Debtor)
 
-    // print debt for just debugging
-    fmt.Println("inserted: debt.Price = ", debt.Price)
-    fmt.Println("inserted: debt.Lender = ", debt.Lender)
-    fmt.Println("inserted: debt.Debtor = ", debt.Debtor)
-
-    return nil
+	return nil
 }
 
 // GetDebts returns slice to seed record debt data.
