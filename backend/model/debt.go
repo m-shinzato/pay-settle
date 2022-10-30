@@ -1,9 +1,13 @@
 package model
 
 import (
-	"fmt"
 	"time"
+    "database/sql"
+
+	_ "github.com/mattn/go-sqlite3"
 )
+
+var DbConnection *sql.DB
 
 // Debt represents data about a record debt.
 type Debt struct {
@@ -12,19 +16,23 @@ type Debt struct {
 	Lender    string    `json:"lender"`
 	Memo      string    `json:"memo"`
 	Price     int       `json:"price"`
-	Completed bool      `json:"completed"`
+	Completed int       `json:"completed"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // Register registers a debt
 func Register(debt *Debt) error {
-	// TODO insert debt to DataBase
+	// DBを開く  なければ作成される
+    DbConnection, _ := sql.Open("sqlite3", "../pay-settle.sqlite")
+    defer DbConnection.Close()
 
-	// print debt for just debugging
-	fmt.Println("inserted: debt.Price = ", debt.Price)
-	fmt.Println("inserted: debt.Lender = ", debt.Lender)
-	fmt.Println("inserted: debt.Debtor = ", debt.Debtor)
+    sql := `insert into debts (lender, debtor, price, memo) values (?, ?, ?, ?);`
+
+    // 実行 結果は返ってこない為、_にする
+    if _, err := DbConnection.Exec(sql, debt.Lender, debt.Debtor, debt.Price, debt.Memo); err != nil {
+        return err
+    }
 
 	return nil
 }
@@ -39,7 +47,7 @@ func GetDebts() []Debt {
 			Lender:    "miryu",
 			Memo:      "葡庵、ランチ",
 			Price:     2080,
-			Completed: false,
+			Completed: 0,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
@@ -49,7 +57,7 @@ func GetDebts() []Debt {
 			Lender:    "miryu",
 			Memo:      "一慶",
 			Price:     7500,
-			Completed: false,
+			Completed: 0,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
@@ -59,7 +67,7 @@ func GetDebts() []Debt {
 			Lender:    "pon",
 			Memo:      "nosh",
 			Price:     800,
-			Completed: false,
+			Completed: 0,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},

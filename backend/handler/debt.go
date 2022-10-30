@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/m-shinzato/pay-settle/model"
 	"net/http"
-	"time"
 )
 
 // GetDebts responds with the list of all albums as JSON.
@@ -19,16 +18,12 @@ func Register(c *gin.Context) {
 	var debt model.Debt
 	c.BindJSON(&debt)
 
-	now := time.Now()
-	debt.CreatedAt = now
-	debt.UpdatedAt = now
-
 	if debt.Price <= 0 {
 		c.String(http.StatusBadRequest, fmt.Sprintf("Price should be positive integer, but got %v", debt.Price))
 		return
 	}
 
-	if !((debt.Debtor == "miryu" && debt.Lender == "pon") || (debt.Debtor == "pon" && debt.Lender == "meee")) {
+	if !((debt.Debtor == "miryu" && debt.Lender == "pon") || (debt.Debtor == "pon" && debt.Lender == "miryu")) {
 		c.String(http.StatusBadRequest, fmt.Sprintf("(debtor, lender) should be (miryu, pon) or (pon, miryu), but (debtor, lender) is (%v, %v)", debt.Debtor, debt.Lender))
 		return
 	}
@@ -46,7 +41,7 @@ func Calculate(c *gin.Context) {
 	debts := model.GetDebts()
 	sum := 0
 	for _, debt := range debts {
-		if debt.Completed {
+		if debt.Completed == 1 {
 			continue
 		}
 		if debt.Debtor == "miryu" {
