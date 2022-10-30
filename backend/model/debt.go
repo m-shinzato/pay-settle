@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // Debt represents data about a record debt.
 type Debt struct {
@@ -12,6 +15,18 @@ type Debt struct {
 	Completed bool      `json:"completed"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// Register registers a debt
+func Register(debt *Debt) error {
+	// TODO insert debt to DataBase
+
+	// print debt for just debugging
+	fmt.Println("inserted: debt.Price = ", debt.Price)
+	fmt.Println("inserted: debt.Lender = ", debt.Lender)
+	fmt.Println("inserted: debt.Debtor = ", debt.Debtor)
+
+	return nil
 }
 
 // GetDebts returns slice to seed record debt data.
