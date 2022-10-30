@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/m-shinzato/pay-settle/model"
-
+    "fmt"
 	"net/http"
 	"time"
 )
@@ -15,7 +15,7 @@ func GetDebts(c *gin.Context) {
 
 // Register handles a requests for registering one debt
 func Register(c *gin.Context) {
-    // TODO parse request body
+    // parse request body
     var debt model.Debt
     c.BindJSON(&debt)
 
@@ -23,11 +23,22 @@ func Register(c *gin.Context) {
     debt.CreatedAt = now
     debt.UpdatedAt = now
 
-    if err := model.Register(&debt); err != nil {
-        c.IndentedJSON(http.StatusInternalServerError, err)
+    if (debt.Price <= 0) {
+        c.String(http.StatusBadRequest, fmt.Sprintf("Price should be positive integer, but got %v", debt.Price))
+        return
     }
 
-    c.IndentedJSON(http.StatusOK, nil)
+    if (!((debt.Debtor == "miryu" && debt.Lender == "pon") || (debt.Debtor  == "pon" && debt.Lender == "meee"))){
+        c.String(http.StatusBadRequest, fmt.Sprintf("(debtor, lender) should be (miryu, pon) or (pon, miryu), but (debtor, lender) is (%v, %v)", debt.Debtor, debt.Lender))
+        return
+    }
+
+    if err := model.Register(&debt); err != nil {
+        c.IndentedJSON(http.StatusInternalServerError, err)
+        return
+    }
+
+    c.String(http.StatusOK, "Success")
 }
 
 // Calculate responds with the price someone have to pay.
