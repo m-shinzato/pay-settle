@@ -2,18 +2,25 @@ package handler
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/m-shinzato/pay-settle/model"
-	"net/http"
 )
 
 // GetDebts responds with the list of all albums as JSON.
 func GetDebts(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, model.GetDebts())
+	debts, err := model.GetDebts()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		fmt.Println(err.Error())
+		return
+	}
+	c.IndentedJSON(http.StatusOK, debts)
 }
 
-// Register handles a requests for registering one debt
-func Register(c *gin.Context) {
+// Pay handles a request for registering one debt.
+func Pay(c *gin.Context) {
 	// parse request body
 	var debt model.Debt
 	c.BindJSON(&debt)
@@ -28,7 +35,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	if err := model.Register(&debt); err != nil {
+	if err := model.Pay(&debt); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -38,7 +45,11 @@ func Register(c *gin.Context) {
 
 // Calculate responds with the price someone have to pay.
 func Calculate(c *gin.Context) {
-	debts := model.GetDebts()
+	debts, err := model.GetDebts()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
 	sum := 0
 	for _, debt := range debts {
 		if debt.Completed == 1 {
@@ -74,4 +85,30 @@ func Calculate(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, res)
+}
+
+// DeleteDebts handles a request for deleting debts.
+func DeleteDebts(c *gin.Context) {
+	// parse request body
+	var debt model.Debt
+	c.BindJSON(&debt)
+
+	if err := model.DeleteDebts(&debt); err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.String(http.StatusOK, "Success")
+}
+
+// Settle handles a request for settling debts.
+func Settle(c *gin.Context) {
+	err := model.Settle()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, err)
+		fmt.Println(err.Error())
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, "Success")
 }

@@ -1,8 +1,7 @@
 package model
 
 import (
-	"time"
-    "database/sql"
+	"database/sql"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -11,65 +10,69 @@ var DbConnection *sql.DB
 
 // Debt represents data about a record debt.
 type Debt struct {
-	ID        string    `json:"id"`
-	Debtor    string    `json:"debtor"`
-	Lender    string    `json:"lender"`
-	Memo      string    `json:"memo"`
-	Price     int       `json:"price"`
-	Completed int       `json:"completed"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        string `json:"id"`
+	Debtor    string `json:"debtor"`
+	Lender    string `json:"lender"`
+	Price     int    `json:"price"`
+	Memo      string `json:"memo"`
+	Completed int    `json:"completed"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
-// Register registers a debt
-func Register(debt *Debt) error {
-	// DBを開く  なければ作成される
-    DbConnection, _ := sql.Open("sqlite3", "../pay-settle.sqlite")
-    defer DbConnection.Close()
+// Pay registers a debt
+func Pay(debt *Debt) error {
+	DbConnection, _ := sql.Open("sqlite3", "../pay-settle.sqlite")
+	defer DbConnection.Close()
 
-    sql := `insert into debts (lender, debtor, price, memo) values (?, ?, ?, ?);`
+	sql := `insert into debts (lender, debtor, price, memo) values (?, ?, ?, ?);`
+	_, err := DbConnection.Exec(sql, debt.Lender, debt.Debtor, debt.Price, debt.Memo)
+	return err
+}
 
-    // 実行 結果は返ってこない為、_にする
-    if _, err := DbConnection.Exec(sql, debt.Lender, debt.Debtor, debt.Price, debt.Memo); err != nil {
-        return err
-    }
+// GetDebts returns slice to seed record debt data.
+func GetDebts() ([]*Debt, error) {
+	DbConnection, _ := sql.Open("sqlite3", "../pay-settle.sqlite")
+	defer DbConnection.Close()
+
+	sql := `select * from debts where completed = 0`
+	recodes, err := DbConnection.Query(sql)
+	if err != nil {
+		return nil, err
+	}
+
+	debts := make([]*Debt, 0)
+	for recodes.Next() {
+		var debt Debt
+		err := recodes.Scan(&debt.ID, &debt.Debtor, &debt.Lender, &debt.Price, &debt.Memo, &debt.Completed, &debt.CreatedAt, &debt.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		debts = append(debts, &debt)
+	}
+	return debts, nil
+}
+
+// DeleteDebts debts
+func DeleteDebts(debt *Debt) error {
+	DbConnection, _ := sql.Open("sqlite3", "../pay-settle.sqlite")
+	defer DbConnection.Close()
+
+	sql := `delete from debts where id = ?`
+	if _, err := DbConnection.Exec(sql, debt.ID); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-// GetDebts returns slice to seed record debt data.
-func GetDebts() []Debt {
-	// TODO DB から借金データを取ってくる
-	return []Debt{
-		{
-			ID:        "1",
-			Debtor:    "pon",
-			Lender:    "miryu",
-			Memo:      "葡庵、ランチ",
-			Price:     2080,
-			Completed: 0,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		},
-		{
-			ID:        "2",
-			Debtor:    "pon",
-			Lender:    "miryu",
-			Memo:      "一慶",
-			Price:     7500,
-			Completed: 0,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		},
-		{
-			ID:        "3",
-			Debtor:    "miryu",
-			Lender:    "pon",
-			Memo:      "nosh",
-			Price:     800,
-			Completed: 0,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		},
-	}
+// Settle a debt
+func Settle() error {
+	DbConnection, _ := sql.Open("sqlite3", "../pay-settle.sqlite")
+	defer DbConnection.Close()
+
+	sql := `update debts set completed = 1 where completed = 0;`
+
+	_, err := DbConnection.Exec(sql)
+	return err
 }
