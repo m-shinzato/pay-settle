@@ -13,7 +13,6 @@ func GetDebts(c *gin.Context) {
 	debts, err := model.GetDebts()
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
-		fmt.Println(err.Error())
 		return
 	}
 	c.IndentedJSON(http.StatusOK, debts)
@@ -92,6 +91,10 @@ func DeleteDebts(c *gin.Context) {
 	// parse request body
 	var debt model.Debt
 	c.BindJSON(&debt)
+  if debt.ID == "" {
+		c.String(http.StatusBadRequest, "ID should not be empty string")
+    return
+  }
 
 	if err := model.DeleteDebts(&debt); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
@@ -106,7 +109,6 @@ func Settle(c *gin.Context) {
 	err := model.Settle()
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
-		fmt.Println(err.Error())
 		return
 	}
 
