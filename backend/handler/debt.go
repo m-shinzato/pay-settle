@@ -91,10 +91,10 @@ func DeleteDebts(c *gin.Context) {
 	// parse request body
 	var debt model.Debt
 	c.BindJSON(&debt)
-  if debt.ID == "" {
+	if debt.ID == "" {
 		c.String(http.StatusBadRequest, "ID should not be empty string")
-    return
-  }
+		return
+	}
 
 	if err := model.DeleteDebts(&debt); err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
