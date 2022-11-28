@@ -9,7 +9,7 @@ import (
 )
 
 // GetDebts responds with the list of all albums as JSON.
-func GetDebts(c *gin.Context) {
+func GetDebts(c *gin.Context){
 	debts, err := model.GetDebts()
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, err)
