@@ -11,7 +11,7 @@ func main() {
 	router.GET("/calculate", handler.Calculate)
 	router.POST("/pay", handler.Pay)
 	router.DELETE("/debts", handler.DeleteDebts)
-	router.POST("/settle", handler.Settle)
+	router.PUT("/settle", handler.Settle)
 
 	router.Run("localhost:8080")
 }
