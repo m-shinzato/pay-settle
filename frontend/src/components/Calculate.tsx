@@ -6,7 +6,7 @@ export const Calculate: React.FC = () => {
   const [debtor, setDebtor] = useState<string>("");
   const [lender, setLender] = useState<string>("");
   const [debts, setDebts] = useState<Array<any>>([]);
-  const trackTextStyle: React.CSSProperties = {
+  const textStyle: React.CSSProperties = {
     fontFamily: "revert-layer",
     fontSize: "2.8vw",
   }
@@ -69,7 +69,7 @@ export const Calculate: React.FC = () => {
 
   return (
     <>
-      <div style={trackTextStyle}>{debtor} が {lender} に {price} 円の借金</div>
+      <div style={textStyle}>{debtor} が {lender} に {price} 円の借金</div>
       <button onClick={settle}>精算する</button>
       {debts.map((value, index) => {
         return <li key={index}>{value.debtor} が {value.lender} に {value.price} 円の借金：{value.memo}</li>
